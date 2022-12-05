@@ -1,33 +1,75 @@
-const { RolesUser } = require('../models/role')
-const { Usuarios } = require('../models/usuario')
+const Role = require('../models/role');
+const { Usuario, Categoria, Producto } = require('../models');
 
-const esRolValido = async (rol = '') => {
+const esRoleValido = async(rol = '') => {
 
-  const existeRol = await RolesUser.findOne({ rol })
-  if (!existeRol) {
-    throw new Error(`${rol} no existe`)
-  }
+    const existeRol = await Role.findOne({ rol });
+    if ( !existeRol ) {
+        throw new Error(`El rol ${ rol } no está registrado en la BD`);
+    }
 }
 
-const emailExiste = async (correo = '') => {
-  const existeUsuarioEmail = await Usuarios.findOne({ correo })
-  if (existeUsuarioEmail) {
-    throw new Error(`${correo} ya registrado`)
+const emailExiste = async( correo = '' ) => {
+
+    // Verificar si el correo existe
+    const existeEmail = await Usuario.findOne({ correo });
+    if ( existeEmail ) {
+        throw new Error(`El correo: ${ correo }, ya está registrado`);
     }
-  }
+}
 
+const existeUsuarioPorId = async( id ) => {
 
-  const usuarioPorIdExiste = async ( id = '' ) => {
-    const idUsuarioExiste = await Usuarios.findOne({ id })
-    if (!idUsuarioExiste) {
-      throw new Error(`${id} ya registrado`)
-      }
+    // Verificar si el correo existe
+    const existeUsuario = await Usuario.findById(id);
+    if ( !existeUsuario ) {
+        throw new Error(`El id no existe ${ id }`);
     }
+}
 
+/**
+ * Categorias
+ */
+const existeCategoriaPorId = async( id ) => {
+
+    // Verificar si el correo existe
+    const existeCategoria = await Categoria.findById(id);
+    if ( !existeCategoria ) {
+        throw new Error(`El id no existe ${ id }`);
+    }
+}
+
+/**
+ * Productos
+ */
+const existeProductoPorId = async( id ) => {
+
+    // Verificar si el correo existe
+    const existeProducto = await Producto.findById(id);
+    if ( !existeProducto ) {
+        throw new Error(`El id no existe ${ id }`);
+    }
+}
+
+/**
+ * Validar colecciones permitidas
+ */
+const coleccionesPermitidas = ( coleccion = '', colecciones = []) => {
+
+    const incluida = colecciones.includes( coleccion );
+    if ( !incluida ) {
+        throw new Error(`La colección ${ coleccion } no es permitida, ${ colecciones }`);
+    }
+    return true;
+}
 
 
 module.exports = {
-  emailExiste,
-  esRolValido,
-  usuarioPorIdExiste
+    esRoleValido,
+    emailExiste,
+    existeUsuarioPorId,
+    existeCategoriaPorId,
+    existeProductoPorId,
+    coleccionesPermitidas
 }
+
